@@ -3,43 +3,32 @@ import path from 'path';
 import puppeteer from 'puppeteer';
 import { url } from './utils';
 
-class Analyzer{
-  private static instance: Analyzer;
-  public titles: string[] = [];
-
-  static getInstance() {
-    if (!Analyzer.instance) {
-      Analyzer.instance = new Analyzer();
-    }
-    return Analyzer.instance;
-  }
-
-  private async initPage() {
+const Analyzer = (async () => {
+  const initPage = async () => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.goto(url);
     return page;
   }
-
-  private async getTitle(page: puppeteer.Page) {
+  
+  const getTitle = async (page: puppeteer.Page) => {
     const label = '.wrapper > div > span > .opblock-tag-section > .opblock-tag > a > span';
     await page.waitForSelector(label, { timeout: 0 });
     const titles = await page.$$eval(label, (labels: Element[]) => labels.map((item: Element) => item.innerHTML));
-    this.titles = titles;
     return titles;
   }
 
-  public async init() {
-    const page = await this.initPage();
-    const titles = await this.getTitle(page);
-    await page.close();
-
-    return await titles;
+  const init = async () => {
+    const page = await initPage();
+    const titles = await getTitle(page);
+    // await writeFiles(titles)
+    // await page.close();
+    return titles;
   }
 
-  constructor() {
-    this.init();
-  }
-}
+  const data = await init();
+  console.log(data)
+  return data;
+})()
 
 export default Analyzer;
