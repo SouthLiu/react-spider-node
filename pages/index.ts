@@ -1,10 +1,7 @@
-const fs = require("fs");
-const path = require('path')
-const puppeteer = require('puppeteer');
-// const puppeteer = require('puppeteer-core');
-interface IItem {
-  innerText: string;
-}
+import fs from 'fs';
+import path from 'path';
+import puppeteer from 'puppeteer';
+// import NoParamCallback from '../node_modules/@types/node/fs';
 
 (async () => {
   let data: string[] = [];
@@ -12,7 +9,6 @@ interface IItem {
   //启动浏览器
   const browers = await puppeteer.launch({
     headless: true, // 有头模式
-    userDataDir: "../data",
   });
   //启动新页面
   const page = await browers.newPage();
@@ -23,7 +19,7 @@ interface IItem {
         const label = '.vd-list-cnt > ul > li > div > div.r > a';
         await page.goto(url);
         await page.waitForSelector(label, { timeout: 0 });
-        let titles = await page.$$eval(label, (labels: IItem[]) => labels.map((item: IItem) => item.innerText))
+        let titles = await page.$$eval(label, (labels: Element[]) => labels.map((item: Element) => item.innerHTML))
         console.log(titles)
         data = data.concat(titles);
       }
@@ -32,7 +28,7 @@ interface IItem {
   // const infoPath = path.resolve(__dirname, '../data')
   // fs.writeFileSync(filtPath, data)
 
-  fs.writeFile("./data/data.json", JSON.stringify(data, null, "\t"), function (err: string) {
+  fs.writeFile("./data/data.json", JSON.stringify(data, null, "\t"), function(err: NodeJS.ErrnoException | null) {
     if (err) {
       console.log('err:', err);
     }
