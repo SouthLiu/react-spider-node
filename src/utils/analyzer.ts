@@ -80,7 +80,7 @@ class Analyzer{
   }
 
   private writeFiles(fileName: string, data: string[]) {
-    return fs.writeFileSync(`./src/data/${fileName}.ts`, data.join(''));
+    return fs.writeFileSync(`./src/api/${fileName}.ts`, data.join(''));
   }
 
   public async init() {

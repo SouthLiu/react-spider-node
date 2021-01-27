@@ -9,7 +9,7 @@ export function filterAPIData(datas: IAPIData[]) {
     const { method, path, description } = item;
     const keys: string[] = path?.split('/') as string[];
     const isExistSuffix = keys?.length > 2;
-    const labels = isExistSuffix ? `_${keys[keys.length - 1]}` : ''
+    let labels = isExistSuffix ?`_${keys.splice(2).join('_')}` : ''
     switch(method) {
       case APIMethof.GET:
         data.push(`

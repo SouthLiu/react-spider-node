@@ -3,21 +3,21 @@ import axios from 'axios';
 /**
  * 查询-教辅分页查询
  */
-export function find_page() {
+export function find_tutorials_page() {
   return axios.get(`/studentWorks/tutorials/page`)
 }
 
 /**
  * 查询-教辅列表查询
  */
-export function find_list() {
+export function find_tutorials_list() {
   return axios.get(`/studentWorks/tutorials/list`)
 }
 
 /**
  * 删除-教辅批量删除
  */
-export function del_batch(ids: string[]) {
+export function del_tutorials_batch(ids: string[]) {
   return axios.delete(`/studentWorks/tutorials/batch/${ids}`)
 }
 
@@ -45,21 +45,21 @@ export function find_tutorials() {
 /**
  * 查询-问题分页查询
  */
-export function find_page() {
+export function find_questions_page() {
   return axios.get(`/studentWorks/questions/page`)
 }
 
 /**
  * 查询-问题列表查询
  */
-export function find_list() {
+export function find_questions_list() {
   return axios.get(`/studentWorks/questions/list`)
 }
 
 /**
  * 删除-问题批量删除
  */
-export function del_batch(ids: string[]) {
+export function del_questions_batch(ids: string[]) {
   return axios.delete(`/studentWorks/questions/batch/${ids}`)
 }
 
