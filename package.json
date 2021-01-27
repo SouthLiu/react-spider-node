@@ -7,7 +7,7 @@
     "dev:build": "tsc -w",
     "dev:start": "node ./build/index.js",
     "dev": "tsc && concurrently npm:dev:*",
-    "start": "ts-node ./pages/index.ts"
+    "start": "ts-node ./src/index.ts"
   },
   "keywords": [],
   "author": "",

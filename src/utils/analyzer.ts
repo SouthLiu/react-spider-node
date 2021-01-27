@@ -1,15 +1,12 @@
 import fs from 'fs';
-import path from 'path';
 import puppeteer from 'puppeteer';
-import { url } from '../pages/utils/utils';
+import { filterAPIData } from '../utils/filter';
+import { IAPIData } from '../utils/types';
+import { url } from '../utils/utils';
 
-interface IAPIData {
-  path: string | null | undefined;
-  method: string | undefined;
-  description: string | undefined;
-}
 class Analyzer{
   private static instance: Analyzer;
+  private map: Map<string, IAPIData[]> = new Map();
 
   static getInstance() {
     if (!Analyzer.instance) {
@@ -20,11 +17,7 @@ class Analyzer{
 
   private async initPage() {
     const browser = await puppeteer.launch({
-      headless: false,
-      // defaultViewport: {
-      //   width: 2000,
-      //   height: 1000
-      // }
+      headless: false
     });
     const page = await browser.newPage();
     await page.goto(url);
@@ -47,36 +40,57 @@ class Analyzer{
     }
   }
 
-  // 获取url路径
+  // 获取url数据
   private async getAPIData(page: puppeteer.Page) {
     const label = `.wrapper > section > div > span > .opblock-tag-section > .no-margin > span > .opblock > .opblock-summary`;
     await page.waitForSelector(label, { timeout: 10000 });
     const APIData = await page.$$eval(label, labels => {
       const data: IAPIData[] = [];
-      labels.map(item => {
+      labels.forEach(item => {
         const method = item.querySelector('.opblock-summary-method')?.innerHTML;
         const path = item.querySelector('.opblock-summary-path')?.getAttribute('data-path');
         const description = item.querySelector('.opblock-summary-description')?.innerHTML;
-        data.push({ method, path, description })
+        const datas = { method, path, description };
+        data.push(datas)
       })
       return data;
     });
-
     return APIData;
   }
 
-  private async writeFiles(data: IAPIData[]) {
-    return await fs.writeFileSync("./data/data.json", JSON.stringify(data, null, "\t"));
+  // TODO: 待优化
+  // 过滤API数据
+  private filterAPIData(datas: IAPIData[]) {
+    datas.length && datas.forEach(item => {
+      const { method, path, description } = item;
+      const key = path?.split('/')[1] as string;
+      const isExist = this.map.has(key);
+      const mapData = isExist ? [item].concat(this.map.get(key) as IAPIData[]) : [item];
+      this.map.set(key, mapData as IAPIData[])
+    })
+  }
+
+  // 写入API文件
+  private writeAPIFiles() {
+    this.map.forEach((item, key) => {
+      const data = filterAPIData(item)
+      this.writeFiles(key, data)
+      // console.log('data:', data)
+    })
+  }
+
+  private writeFiles(fileName: string, data: string[]) {
+    return fs.writeFileSync(`./src/data/${fileName}.ts`, data.join(''));
   }
 
   public async init() {
     const page = await this.initPage();
     const titles = await this.getTitle(page);
     await this.openInfo(page, titles);
-    const data = await this.getAPIData(page)
+    const APIData = await this.getAPIData(page)
+    const data = this.filterAPIData(APIData);
+    this.writeAPIFiles()
     // await page.close();
-
-    await this.writeFiles(data)
   }
 
   constructor() {
@@ -84,4 +98,5 @@ class Analyzer{
   }
 }
 
-new Analyzer()
+// new Analyzer()
+export default Analyzer;

@@ -2,5 +2,3 @@
 
 ## yarn 
 ## yarn start 
-"# react-spider" 
-"# react-spider-node" 
