@@ -1,21 +1,22 @@
 import fs from 'fs';
+import path from 'path';
 import puppeteer from 'puppeteer';
 import { filterAPIData } from '../utils/filter';
 import { IAPIData } from '../utils/types';
-import { url } from '../utils/utils';
+// import { url } from './configs';
 
 class Analyzer{
   private static instance: Analyzer;
   private map: Map<string, IAPIData[]> = new Map();
 
-  static getInstance() {
-    if (!Analyzer.instance) {
-      Analyzer.instance = new Analyzer();
-    }
-    return Analyzer.instance;
-  }
+  // static getInstance() {
+  //   if (!Analyzer.instance) {
+  //     Analyzer.instance = new Analyzer(url);
+  //   }
+  //   return Analyzer.instance;
+  // }
 
-  private async initPage() {
+  private async initPage(url: string) {
     const browser = await puppeteer.launch({
       headless: false
     });
@@ -38,6 +39,13 @@ class Analyzer{
       await page.waitForSelector(label, { timeout: 10000 });
       await page.click(label)
     }
+  }
+
+  // 打开概要
+  private async openSchema(page: puppeteer.Page) {
+    const label = `.model-example > .tab`
+    await page.waitForSelector(label, { timeout: 5000 });
+    await page.click(label)
   }
 
   // 获取url数据
@@ -79,22 +87,25 @@ class Analyzer{
     })
   }
 
-  private writeFiles(fileName: string, data: string[]) {
-    return fs.writeFileSync(`./src/api/${fileName}.ts`, data.join(''));
+  private writeFiles(fileName: string, data: string[], isMoudules?: boolean) {
+    const path = `./src/${isMoudules ? 'data' : 'api'}/${fileName}${isMoudules && '.modules'}.ts`;
+    return fs.writeFileSync(path, data.join(''));
   }
 
-  public async init() {
-    const page = await this.initPage();
+  public async init(url: string) {
+    const page = await this.initPage(url);
     const titles = await this.getTitle(page);
     await this.openInfo(page, titles);
+    // await this.openSchema(page)
     const APIData = await this.getAPIData(page)
     const data = this.filterAPIData(APIData);
     this.writeAPIFiles()
     // await page.close();
   }
 
-  constructor() {
-    this.init();
+  constructor(url: string) {
+    this.init(url);
+    console.log('init:', url)
   }
 }
 
