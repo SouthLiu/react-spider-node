@@ -12,10 +12,14 @@ class Analyzer{
     return Analyzer.instance;
   }
 
-  private async initPage(url: string) {
+  private async initBrowser() {
     const browser = await puppeteer.launch({
       headless: false
     });
+    return browser;
+  }
+
+  private async initPage(url: string, browser: puppeteer.Browser) {
     const page = await browser.newPage();
     await page.goto(url);
     return page;
@@ -76,13 +80,15 @@ class Analyzer{
   }
 
   public async getData(url: string) {
-    const page = await this.initPage(url);
+    const browser = await this.initBrowser();
+    const page = await this.initPage(url, browser);
     const titles = await this.getTitle(page);
     await this.openInfo(page, titles);
     // await this.openSchema(page)
     const APIData = await this.getAPIData(page)
     const data = this.filterAPIData(APIData);
     await page.close();
+    await browser.close();
     // console.log('data:', data)
     return data;
   }
