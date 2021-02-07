@@ -1,8 +1,6 @@
-import fs from 'fs';
-import zlib from 'zlib';
-import { pipeline } from 'stream';
+import fs from 'fs'
 import jszip from 'jszip';
-import { NextFunction, Request, Response, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import Analyzer from '../utils/analyzer';
 import Crowler from '../utils/crawler';
 import { filterAPIData } from '../utils/filter';
@@ -42,40 +40,32 @@ router.post('/zip', async (request, response) => {
   .pipe(fs.createWriteStream(filePath))  //打包后的包名可以自己根据需求定义，路径可以根据需求更改
   .on('finish', function () {
     console.log("out.zip written.");   // 管道写完数据后，打印出提示
-    // response.send(`<a href="/down/${fileName}">download</a>`)
     response.json(getResponseData(500, '生成zip成功'))
   });
 })
 
-router.get('/down/:fileName', (request, response, next) => {
+router.get('/down/:fileName', (request, response) => {
   const fileName = request.params.fileName;
-  const filePath = path.join(__dirname, `../data/${fileName}.zip`);
-  downFile(fileName, response, next);
-  // deleteFile(filePath);
+  downFile(fileName, response);
 })
 
 // 下载文件
-function downFile(fileName: string | number, response: Response, next: NextFunction) {
+function downFile(fileName: string | number, response: Response) {
   console.log('down')
   // 实现文件下载 
   const filePath = path.join(__dirname, `../data/${fileName}.zip`);
   const stats = fs.statSync(filePath); 
-  if(!stats.isFile()){
+  if(stats.isFile()){
+    response.set({
+      'Content-Type': 'application/octet-stream',
+      'Content-Disposition': `attachment; filename=${fileName}.zip`,
+      'Content-Length': stats.size
+    });
+    fs.createReadStream(filePath).pipe(response);
+    response.json(getResponseData(500, '下载成功'))
+  } else {
     response.end(404);
   }
-  response.set({
-    'Content-Type': 'application/x-zip-compressed',
-    'Content-Disposition': `attachment; filename=${fileName}`,
-    'Content-Length': stats.size
-  });
-  response.download(filePath, `${fileName}.zip`, (err) => {
-    err && console.log('download err:', err)
-  });
-}
-
-// 删除文件
-function deleteFile(filePath: string) {
-  fs.unlinkSync(filePath)
 }
 
 

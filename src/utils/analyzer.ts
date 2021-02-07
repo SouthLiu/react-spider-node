@@ -1,20 +1,16 @@
-import fs from 'fs';
-import path from 'path';
 import puppeteer from 'puppeteer';
-import { filterAPIData } from '../utils/filter';
 import { IAPIData } from '../utils/types';
 // import { url } from './configs';
 
 class Analyzer{
   private static instance: Analyzer;
-  private map: Map<string, IAPIData[]> = new Map();
 
-  // static getInstance() {
-  //   if (!Analyzer.instance) {
-  //     Analyzer.instance = new Analyzer(url);
-  //   }
-  //   return Analyzer.instance;
-  // }
+  static getInstance() {
+    if (!Analyzer.instance) {
+      Analyzer.instance = new Analyzer();
+    }
+    return Analyzer.instance;
+  }
 
   private async initPage(url: string) {
     const browser = await puppeteer.launch({
@@ -66,46 +62,34 @@ class Analyzer{
     return APIData;
   }
 
-  // TODO: 待优化
   // 过滤API数据
   private filterAPIData(datas: IAPIData[]) {
+    const map: Map<string, IAPIData[]> = new Map();
     datas.length && datas.forEach(item => {
-      const { method, path, description } = item;
+      const { path } = item;
       const key = path?.split('/')[1] as string;
-      const isExist = this.map.has(key);
-      const mapData = isExist ? [item].concat(this.map.get(key) as IAPIData[]) : [item];
-      this.map.set(key, mapData as IAPIData[])
+      const isExist = map.has(key);
+      const mapData = isExist ? [item].concat(map.get(key) as IAPIData[]) : [item];
+      map.set(key, mapData as IAPIData[])
     })
+    return map;
   }
 
-  // 写入API文件
-  private writeAPIFiles() {
-    this.map.forEach((item, key) => {
-      const data = filterAPIData(item)
-      this.writeFiles(key, data)
-      // console.log('data:', data)
-    })
-  }
-
-  private writeFiles(fileName: string, data: string[], isMoudules?: boolean) {
-    const path = `./src/${isMoudules ? 'data' : 'api'}/${fileName}${isMoudules && '.modules'}.ts`;
-    return fs.writeFileSync(path, data.join(''));
-  }
-
-  public async init(url: string) {
+  public async getData(url: string) {
     const page = await this.initPage(url);
     const titles = await this.getTitle(page);
     await this.openInfo(page, titles);
     // await this.openSchema(page)
     const APIData = await this.getAPIData(page)
     const data = this.filterAPIData(APIData);
-    this.writeAPIFiles()
-    // await page.close();
+    await page.close();
+    // console.log('data:', data)
+    return data;
   }
 
-  constructor(url: string) {
-    this.init(url);
-    console.log('init:', url)
+  private constructor() {
+    // this.init(url);
+    // console.log('init:', url)
   }
 }
 
