@@ -6,9 +6,8 @@ const app = express();
 
 app.all("*", function(request, response, next){
   //设置允许跨域的域名，*代表允许任意域名跨域
-  var orginList=[
+  const orginList=[
     "http://localhost:5000.com",
-    "http://www.baidu.com",
   ]
   const originUrl = request.headers.origin?.toLowerCase();
   if(orginList.includes(originUrl as string)){

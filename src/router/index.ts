@@ -51,7 +51,9 @@ router.get('/down/:fileName', (request, response, next) => {
   const fileName = request.params.fileName;
   const filePath = path.join(__dirname, `../data/${fileName}.zip`);
   downFile(fileName, response, next);
-  // deleteFile(filePath);
+  setTimeout(() => {
+    deleteFile(filePath);
+  }, 3000);
 })
 
 // 下载文件
