@@ -53,7 +53,7 @@ router.get('/down/:fileName', (request, response) => {
 function downFile(fileName: string | number, response: Response) {
   console.log('down')
   // 实现文件下载 
-  const filePath = path.join(__dirname, `../data/${fileName}.zip`);
+  const filePath = path.join(__dirname, `../../src/data/${fileName}.zip`);
   const stats = fs.statSync(filePath); 
   if(stats.isFile()){
     response.set({

@@ -30,7 +30,7 @@ router.post('/zip', async (request, response) => {
   const zip = new jszip();
   const analyzer = await Analyzer.getInstance().getData(url);
   const apiFile = zip.folder('api') as jszip;
-  const filePath = path.join(__dirname, `../data/${fileName}.zip`);
+  const filePath = path.join(__dirname, `../../src/data/${fileName}.zip`);
   analyzer.forEach((item, key) => {
     // const keyFile = apiFile.folder(key) as jszip;
     const value = filterAPIData(item);
@@ -47,7 +47,7 @@ router.post('/zip', async (request, response) => {
 
 router.get('/down/:fileName', (request, response, next) => {
   const fileName = request.params.fileName;
-  const filePath = path.join(__dirname, `../data/${fileName}.zip`);
+  const filePath = path.join(__dirname, `../../src/data/${fileName}.zip`);
   downFile(fileName, response, next);
   // setTimeout(() => {
   //   deleteFile(filePath);
@@ -58,7 +58,7 @@ router.get('/down/:fileName', (request, response, next) => {
 function downFile(fileName: string | number, response: Response, next: NextFunction) {
   console.log('down')
   // 实现文件下载 
-  const filePath = path.join(__dirname, `../data/${fileName}.zip`);
+  const filePath = path.join(__dirname, `../../src/data/${fileName}.zip`);
   const stats = fs.statSync(filePath); 
   if(!stats.isFile()){
     response.end(404);
