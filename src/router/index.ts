@@ -1,6 +1,4 @@
 import fs from 'fs';
-import zlib from 'zlib';
-import { pipeline } from 'stream';
 import jszip from 'jszip';
 import { NextFunction, Request, Response, Router } from 'express';
 import Analyzer from '../utils/analyzer';
@@ -12,7 +10,7 @@ import path from 'path';
 const router = Router();
 
 router.get('/', (request, response) => {
-  response.send('asd');
+  response.send('index');
 })
 
 router.post('/analzer', async (request, response) => {
