@@ -7,7 +7,8 @@
     "dev:build": "tsc -w",
     "dev:start": "node ./build/index.js",
     "dev": "tsc && concurrently npm:dev:*",
-    "start": "ts-node ./src/index.ts"
+    "start": "ts-node ./src/index.ts",
+    "pm2": "tsc && npm:dev:build && pm2 start ./build/index.js"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +19,7 @@
     "concurrently": "^5.3.0",
     "jszip": "^3.5.0",
     "nodemon": "^2.0.7",
+    "pm2": "^4.5.4",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
