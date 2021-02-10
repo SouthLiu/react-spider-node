@@ -1,11 +1,11 @@
 import fs from 'fs';
+import path from 'path';
 import jszip from 'jszip';
 import { NextFunction, Request, Response, Router } from 'express';
 import Analyzer from '../utils/analyzer';
 import Crowler from '../utils/crawler';
 import { filterAPIData } from '../utils/filter';
 import { getResponseData } from '../utils/response'
-import path from 'path';
 
 const router = Router();
 

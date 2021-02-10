@@ -1,11 +1,12 @@
 import fs from 'fs';
+import path from 'path';
 import { IAPIData } from './types';
 import { filterAPIData } from './filter';
 
 class Crowler{
   private writeFiles(fileName: string, data: string[], isMoudules?: boolean) {
-    const path = `./src/${isMoudules ? 'data' : 'api'}/${fileName}${isMoudules && '.modules'}.ts`;
-    return fs.writeFileSync(path, data.join(''));
+    const filePath = path.join(__dirname, `../${isMoudules ? 'data' : 'api'}/${fileName}${isMoudules && '.modules'}.ts`);
+    return fs.writeFileSync(filePath, data.join(''));
   }
 
   // 写入API文件
