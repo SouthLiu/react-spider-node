@@ -14,7 +14,8 @@ class Analyzer{
 
   private async initBrowser() {
     const browser = await puppeteer.launch({
-      headless: true
+      headless: true,
+      args: ['--no-sandbox']
     });
     return browser;
   }
